@@ -33,23 +33,22 @@ def forward_backward_prop(data, labels, params, dimensions):
     ofs += H * Dy
     b2 = np.reshape(params[ofs:ofs + Dy], (1, Dy))
    
-    for i in range(N):
-      ### YOUR CODE HERE: forward propagation
-      zinj = np.dot(data,W1) + b1
-      zi = sigmoid(zinj)
-      zoin = np.dot(zi,W2) + b2
-      output = sigmoid(zoin)
-      ### END YOUR CODE
+    ### YOUR CODE HERE: forward propagation
+    zinj = np.dot(data,W1) + b1
+    zi = sigmoid(zinj)
+    zoin = np.dot(zi,W2) + b2
+    output = sigmoid(zoin)
+    ### END YOUR CODE
 
-      ### YOUR CODE HERE: backward propagation
-      cost= np.sum((output-labels)**2)
-      dk = (labels-output) * sigmoid_grad(zoin)
-      gradW2 = np.dot(zi.T,dk)
-      gradb2 = dk
-      dinj = np.sum(np.dot(dk,W2.T))
-      dj = dinj * sigmoid_grad(zinj)
-      gradW1 = np.dot(data.T,dj)
-      gradb1 = dj
+    ### YOUR CODE HERE: backward propagation
+    cost= np.sum((output-labels)**2)
+    dk = (labels-output) * sigmoid_grad(zoin)
+    gradW2 = np.dot(zi.T,dk)
+    gradb2 = dk
+    dinj = np.sum(np.dot(dk,W2.T))
+    dj = dinj * sigmoid_grad(zinj)
+    gradW1 = np.dot(data.T,dj)
+    gradb1 = dj
     ### END YOUR CODE
 
     ### Stack gradients (do not modify)
