@@ -1,12 +1,6 @@
-#!/usr/bin/env python
 
 import numpy as np
 import random
-
-from q1_softmax import softmax
-from q2_sigmoid import sigmoid, sigmoid_grad
-from q2_gradcheck import gradcheck_naive
-
 
 def forward_backward_prop(data, labels, params, dimensions):
     """
@@ -24,7 +18,9 @@ def forward_backward_prop(data, labels, params, dimensions):
     ### Unpack network parameters (do not modify)
     ofs = 0
     Dx, H, Dy = (dimensions[0], dimensions[1], dimensions[2])
- 
+    #print(params)
+    print(params[ofs:ofs + Dx * H])
+    print(type(params))
     W1 = np.reshape(params[ofs:ofs + Dx * H], (Dx, H))
     ofs += Dx * H
     b1 = np.reshape(params[ofs:ofs + H], (1, H))
@@ -37,18 +33,19 @@ def forward_backward_prop(data, labels, params, dimensions):
     zinj = np.dot(data,W1) + b1
     zi = sigmoid(zinj)
     zoin = np.dot(zi,W2) + b2
-    output = sigmoid(zoin)
+    output = softmax(zoin)
     ### END YOUR CODE
 
     ### YOUR CODE HERE: backward propagation
-    cost= np.sum((output-labels)**2)
-    dk = (labels-output) * sigmoid_grad(zoin)
+    cost= np.sum((output-labels)**2)/N
+    dk = (output-labels)/N
     gradW2 = np.dot(zi.T,dk)
-    gradb2 = dk
+    gradb2 = np.sum(dk,0,keepdims=True)
+    
     dinj = np.sum(np.dot(dk,W2.T))
-    dj = dinj * sigmoid_grad(zinj)
+    dj = sigmoid_grad(zi) * dinj
     gradW1 = np.dot(data.T,dj)
-    gradb1 = dj
+    gradb1 = np.sum(dj,0)
     ### END YOUR CODE
 
     ### Stack gradients (do not modify)
@@ -73,7 +70,7 @@ def sanity_check():
         labels[i, random.randint(0,dimensions[2]-1)] = 1
 
     params = np.random.randn((dimensions[0] + 1) * dimensions[1] + (
-        dimensions[1] + 1) * dimensions[2], )
+        dimensions[1]  + 1)* dimensions[2], )
 
     gradcheck_naive(lambda params:
         forward_backward_prop(data, labels, params, dimensions), params)
